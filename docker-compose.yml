@@ -1,20 +1,59 @@
 services:
+  # TeamCity Server
   teamcity-server:
-    image: jetbrains/teamcity-server
+    image: jetbrains/teamcity-server:2023.11
     container_name: teamcity-server
     ports:
       - "8111:8111"
+    environment:
+      - TEAMCITY_SERVER_MEM_OPTS=-Xmx2g -XX:ReservedCodeCacheSize=512m
     volumes:
-      - ./teamcity-data:/data/teamcity_server/datadir
-      - ./teamcity-logs:/opt/teamcity/logs
+      - teamcity-server-datadir:/data/teamcity_server/datadir
+      - teamcity-server-logs:/opt/teamcity/logs
+    restart: unless-stopped
+    networks:
+      - teamcity-network
 
+  # Basic TeamCity Agent
   teamcity-agent:
-    build: ./agent
+    image: jetbrains/teamcity-agent:2023.11
     container_name: teamcity-agent
     environment:
-      - SERVER_URL=http://teamcity-server:8111
+      - SERVER_URL=https://teamcity.alexvoniroks.duckdns.org/
+      - AGENT_NAME=teamcity-agent
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./app:/app
+      - teamcity-agent-conf:/data/teamcity_agent/conf
+    restart: unless-stopped
+    networks:
+      - teamcity-network
     depends_on:
       - teamcity-server
+
+  # Extended Agent with Node.js
+  teamcity-agent-extended:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: teamcity-agent-extended
+    environment:
+      - SERVER_URL=https://teamcity.alexvoniroks.duckdns.org/
+      - AGENT_NAME=teamcity-agent-extended
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - teamcity-agent-extended-conf:/data/teamcity_agent/conf
+    restart: unless-stopped
+    networks:
+      - teamcity-network
+    depends_on:
+      - teamcity-server
+
+volumes:
+  teamcity-server-datadir:
+  teamcity-server-logs:
+  teamcity-agent-conf:
+  teamcity-agent-extended-conf:
+
+networks:
+  teamcity-network:
+    driver: bridge
