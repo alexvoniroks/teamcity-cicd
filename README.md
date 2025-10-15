@@ -32,7 +32,7 @@ It covers the full cycle: source code → build → test → Docker image build 
 ## 🛠️ Setup
 
 ### 1. Database (PostgreSQL)
-TeamCity is configured to use PostgreSQL
+TeamCity is configured to use PostgreSQL on VM Proxmox
 
 
 ---
