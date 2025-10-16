@@ -88,13 +88,13 @@ New Docker image is available for deployment.
 
 📊 Verification
 
-In Portainer → Images, check that teamcity-lab-app:latest is built.
+In Portainer → Images, check that teamcity-cicd-app:latest is built.
 
 In Docker Hub → check your repository for the pushed image.
 
 Test locally:
 
-docker run -it --rm -p 3000:3000 <your-dockerhub-username>/teamcity-lab-app:latest
+docker run -it --rm -p 3000:3000 <your-dockerhub-username>/teamcity-cicd-app:latest
 
 
 
